@@ -1,0 +1,16 @@
+{
+  "MONGO": {
+    "connection_string": "mongodb://39.108.162.204:27017/fof_crawler",
+    "db_name": "fof_crawler"
+  },
+  "HTTP.PORT": 8080,
+  "HTTP.HOST": "localhost",
+
+  "MYSQL": {
+    "host": "39.108.162.204",
+    "port": 3306,
+    "database": "test",
+    "username": "root",
+    "password": "4JrFsm9HdcPPKEMm"
+  }
+}

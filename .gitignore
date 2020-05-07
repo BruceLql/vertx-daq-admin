@@ -1,0 +1,9 @@
+*.class
+.gradle
+.idea
+*.iml
+.vertx
+build
+out
+.DS_Store
+#config.json

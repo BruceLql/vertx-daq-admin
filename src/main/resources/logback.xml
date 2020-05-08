@@ -127,7 +127,7 @@
 
 
 <!--     flume收集 -->
-<!--    <appender name="FLUME_LOG" class="kavi.tech.service.flume.FlumeLogstashV1Appender">-->
+<!--    <appender name="FLUME_LOG" class="fof.daq.service.flume.FlumeLogstashV1Appender">-->
 <!--        <flumeAgents>192.168.1.223:44444</flumeAgents>-->
 <!--        <flumeProperties>-->
 <!--            connect-timeout=4000;-->
@@ -150,13 +150,13 @@
 <!--    </appender>-->
 
     <!-- 自定义存入mongo db -->
-    <appender name="mongoDB" class="kavi.tech.service.common.utils.MyMongoDBAppend">
+    <appender name="mongoDB" class="fof.daq.service.common.utils.MyMongoDBAppend">
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
         </filter>
     </appender>
 
     <!-- 日志指定包打印 -->
-    <logger name="kavi.tech.service.common.utils.LogUtils" level="info">
+    <logger name="fof.daq.service.common.utils.LogUtils" level="info">
 <!--        <appender-ref ref="DB"/>-->
         <appender-ref ref="INFO_FILE"/>
         <appender-ref ref="ERROR_FILE"/>

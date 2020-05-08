@@ -1,5 +1,7 @@
 package fof.daq.service.common.extension
 
+import java.text.SimpleDateFormat
+import java.util.*
 import java.util.regex.Pattern
 
 
@@ -114,3 +116,12 @@ fun splitYmd(strYmd: String): Int {
         totalInt
     }
 }
+
+
+/**
+ * 时间格式转换： 时间戳 ->
+ */
+fun transToString(time: Long): String {
+    return SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(time)
+}
+

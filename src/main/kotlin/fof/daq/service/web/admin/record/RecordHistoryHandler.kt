@@ -7,6 +7,7 @@ import io.vertx.ext.web.RoutingContext
 import fof.daq.service.common.extension.logger
 import fof.daq.service.common.extension.toEntity
 import fof.daq.service.common.extension.value
+import fof.daq.service.mongo.component.PageItemModel
 import fof.daq.service.mongo.model.CarrierReportInfoModel
 import fof.daq.service.mongo.model.RecordModel
 import fof.daq.service.mysql.dao.SysConfigDao
@@ -35,21 +36,24 @@ class RecordHistoryHandler @Autowired constructor(
 
         val json = event.bodyAsJson
         val mobile = json.value<String>("mobile")
-        val page = json.value<Int>("page")?: throw IllegalArgumentException("缺少当前页参数 page！")
-        val size = json.value<Int>("size")?: throw IllegalArgumentException("缺少每页条数参数 size！")
+        val page = json.value<Int>("page") ?: throw IllegalArgumentException("缺少当前页参数 page！")
+        val size = json.value<Int>("size") ?: throw IllegalArgumentException("缺少每页条数参数 size！")
         val query = JsonObject()
         if (!mobile.isNullOrEmpty()) {
             query.put("mobile", mobile)
         }
-        carrierReportInfoModel.queryHistoryListResultData(query, page, size).subscribe({ result ->
 
-            log.info("result : ${result.toJson()}")
+        vertx.executeBlocking<String>({
+            carrierReportInfoModel.queryHistoryListResultData(query, page, size).subscribe({ result ->
 
-            event.response().end(result.toJson().toString())
-
+                log.info("result : ${result.toJson()}")
+                it.complete(result.toJson().toString())
+            }, {
+                it.printStackTrace()
+                event.response().end()
+            })
         }, {
-            it.printStackTrace()
-            event.response().end()
+            event.response().end(it.result())
         })
 
     }

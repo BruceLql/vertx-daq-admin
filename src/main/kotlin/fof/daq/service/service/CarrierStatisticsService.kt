@@ -1,14 +1,13 @@
 package fof.daq.service.service
 
-import com.mongodb.BasicDBObject
-import fof.daq.service.mongo.model.CarrierStatisticsModel
-import io.vertx.core.json.JsonArray
+import fof.daq.service.mysql.component.PageItemDao
+import fof.daq.service.mysql.dao.CarrierStatisticsDao
+import fof.daq.service.mysql.entity.CarrierStatistics
 import io.vertx.core.json.JsonObject
+import io.vertx.rxjava.ext.asyncsql.AsyncSQLClient
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
-import rx.Observable
-import java.text.SimpleDateFormat
-import java.util.*
+import rx.Single
 
 /**
  * 运营商爬虫任务数据统计
@@ -16,29 +15,46 @@ import java.util.*
  */
 @Service
 class CarrierStatisticsService @Autowired constructor(
-    private var carrierStatisticsModel: CarrierStatisticsModel
+    private val client: AsyncSQLClient,
+    private var carrierStatisticsDao: CarrierStatisticsDao
 ) {
 
-    fun dataSelect(startTime: String, endTime: String): Observable<JsonObject>? {
-        val query = JsonObject()
-        val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
-        sdf.calendar = GregorianCalendar(SimpleTimeZone(0, "GMT"))
+    /**
+     * 采集任务结束后 存储采集结果记录
+     */
+    fun dataInsertToMysql(carrierStatistics: CarrierStatistics): Single<CarrierStatistics>? {
 
-        query.put("created_at", BasicDBObject("\$gte", startTime).append("\$lte", startTime))
-        val all = BasicDBObject("_id", "\$sucess")
-            .append("ave_time", BasicDBObject("\$avg", "\$statistics"))
-            .append("max_time", BasicDBObject("\$max", "\$statistics"))
-            .append("min_time", BasicDBObject("\$min", "\$statistics"))
-            .append("count", BasicDBObject("\$sum", 1))
+        return this.client.rxGetConnection().flatMap { conn ->
+            carrierStatisticsDao.insert(conn, carrierStatistics)
+                .doAfterTerminate(conn::close)
+        }
+    }
 
-        val match = BasicDBObject("\$match", query)
-        val group = BasicDBObject("\$group", all)
-        val jsonArray = JsonArray()
-        jsonArray.add(match)
-        jsonArray.add(group)
+    /**
+     * 采集数据汇总查询  (不分页)
+     */
+    fun queryTotal(startTime: String, endTime: String): Single<MutableList<List<JsonObject>>> {
+        println("$startTime +++++++++++++++++++++:$startTime")
+        val queryTotal = carrierStatisticsDao.queryTotal(startTime, endTime)
+        val groupByOperator = carrierStatisticsDao.queryGroupByOperator(startTime, endTime)
+        return Single.concat(
+            queryTotal,
+            groupByOperator
+        ).toList().toSingle()
+    }
 
-        println("OOOOOOOOOOOOOOOOOOOOOOOOO")
-        return carrierStatisticsModel.queryTotalData(jsonArray)
+    /**
+     *  按运营商类型、地区分组查询采集统计信息  分页查询
+     */
+    fun queryGroupByOperatorAndAreaListPage(
+        startTime: String,
+        endTime: String,
+        currentPage: Int,
+        size: Int
+    ): Single<PageItemDao<JsonObject>> {
+
+        return carrierStatisticsDao.queryGroupByOperatorAndArea(startTime, endTime, currentPage, size)
+
     }
 
 

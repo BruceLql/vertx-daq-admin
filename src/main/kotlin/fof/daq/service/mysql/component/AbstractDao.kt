@@ -109,13 +109,13 @@ abstract class AbstractDao<T: Entity> constructor(private val client : AsyncSQLC
      * @param currentPage 查询页面
      * @param pageSize 每页显示数量
      */
-    fun listPage(sqlCount: SQL,
-                 sqlList: SQL,
+    fun listPage(sqlCount: String,
+                 sqlList: String,
                  currentPage: Int = PageItemDao.PAGE,
                  pageSize: Int = PageItemDao.SIZE
     ): Single<PageItemDao<JsonObject>>{
         return client.rxGetConnection().flatMap { conn ->
-            querySingle(conn, sqlCount.toString())
+            querySingle(conn, sqlCount)
             .map { result ->
                 PageItemDao<JsonObject>().apply {
                     this.totalCount = try { result.getInteger(0) } catch (e: Exception) { 0 }
@@ -124,7 +124,7 @@ abstract class AbstractDao<T: Entity> constructor(private val client : AsyncSQLC
                 }
             }
             .flatMap { pageItem ->
-                query(conn, sqlList.toString() + " LIMIT ${pageItem.startRow}, ${pageItem.pageSize}" )
+                query(conn, sqlList + " LIMIT ${pageItem.startRow}, ${pageItem.pageSize}" )
                 .map { pageItem.apply { this.items = it.rows } }
             }
             .doAfterTerminate(conn::close)

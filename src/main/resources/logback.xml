@@ -116,14 +116,14 @@
 
 
 <!--     输出日志到mysql数据库-->
-    <appender name="DB" class="ch.qos.logback.classic.db.DBAppender">
-        <connectionSource class="ch.qos.logback.core.db.DriverManagerConnectionSource">
-            <driverClass>${log.db.driverClass}</driverClass>
-            <url>${log.db.url}</url>
-            <user>${log.db.userName}</user>
-            <password>${log.db.password}</password>
-        </connectionSource>
-    </appender>
+<!--    <appender name="DB" class="ch.qos.logback.classic.db.DBAppender">-->
+<!--        <connectionSource class="ch.qos.logback.core.db.DriverManagerConnectionSource">-->
+<!--            <driverClass>${log.db.driverClass}</driverClass>-->
+<!--            <url>${log.db.url}</url>-->
+<!--            <user>${log.db.userName}</user>-->
+<!--            <password>${log.db.password}</password>-->
+<!--        </connectionSource>-->
+<!--    </appender>-->
 
 
 <!--     flume收集 -->

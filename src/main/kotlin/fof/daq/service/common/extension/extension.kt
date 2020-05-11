@@ -30,7 +30,7 @@ fun regexInt(num: String): Boolean {
  */
 fun regexDate(dateStr: String): Boolean {
 
-    var mainRegex = "\\d{4}(\\-|\\/|.)\\d{1,2}\\1\\d{1,2}\\s\\d{2}(:)\\d{2}(:)\\d{2}"
+    var mainRegex = "\\d{4}(\\-|\\/|.)\\d{2}\\1\\d{2}\\s\\d{2}(:)\\d{2}(:)\\d{2}"
     var p = Pattern.compile(mainRegex)
     val m = p.matcher(dateStr)
     return m.matches()

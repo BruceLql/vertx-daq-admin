@@ -24,41 +24,49 @@ class MybatisAuthProvider @Autowired constructor(
      * 登路密码验证器
      * */
     override fun authenticate(authInfo: JsonObject, handler: Handler<AsyncResult<User>>) {
-        val username = authInfo.value<String>("user_name")
+        val username = authInfo.value<String>("username")
+
         if (username == null) {
             handler.handle(Future.failedFuture(HttpStatusException(400, NullPointerException("Username is null"))))
             return
         }
-        val password = authInfo.value<String>("pass_word")
+        val password = authInfo.value<String>("password")
         if (password == null) {
             handler.handle(Future.failedFuture(HttpStatusException(400, NullPointerException("Password is null"))))
             return
         }
 
         // 数据库密码验证
-        userDao.login(listOf(Pair("user_name", username)))
-        .map { user ->
-            user ?: throw HttpStatusException(403, NullPointerException("User is null"))
-            val userPassword = user.pass_word
-            val passwordSalt = user.passwordSalt
-            when{
-                userPassword == null -> throw HttpStatusException(403, NullPointerException("User password is null"))
-                passwordSalt == null -> throw HttpStatusException(403, NullPointerException("User salt is null"))
-                else -> {
-                    // todo 增加权限级别
-                    val version = strategy.version(userPassword)
-                    val hashedPassword = strategy.computeHash(password, passwordSalt, version)
-                    when(strategy.isEqual(userPassword, hashedPassword)){
-                        true -> user
-                        else -> throw HttpStatusException(403, AuthenticationException("User authentication error"))
+        userDao.login(listOf(Pair("username", username)))
+            .map { user ->
+                user ?: throw HttpStatusException(403, NullPointerException("User is null"))
+                val userPassword = user.password
+                val passwordSalt = user.passwordSalt
+                when{
+                    userPassword == null -> throw HttpStatusException(403, NullPointerException("User password is null"))
+                    passwordSalt == null -> throw HttpStatusException(403, NullPointerException("User salt is null"))
+                    else -> {
+                        // todo 增加权限级别
+                        val version = strategy.version(userPassword)
+                        val hashedPassword = strategy.computeHash(password, passwordSalt, version)
+                        when(strategy.isEqual(userPassword, hashedPassword)){
+                            true -> user
+                            else -> throw HttpStatusException(403, AuthenticationException("User authentication error"))
+                        }
                     }
                 }
             }
-        }
-        .subscribe({ user ->
-            handler.handle(Future.succeededFuture(fof.daq.service.common.auth.AuthUser(this)))
-        },{
-            handler.handle(Future.failedFuture(it))
-        })
+            .subscribe({ user ->
+                println("login() success :${user.toJson()}")
+                val returnUser = fof.daq.service.mysql.entity.User()
+                returnUser.mobile=user.mobile
+                returnUser.id=user.id
+                returnUser.username=user.username
+                returnUser.createdAt=user.createdAt
+
+                handler.handle(Future.succeededFuture(AuthUser(this, returnUser)))
+            },{
+                handler.handle(Future.failedFuture(it))
+            })
     }
 }

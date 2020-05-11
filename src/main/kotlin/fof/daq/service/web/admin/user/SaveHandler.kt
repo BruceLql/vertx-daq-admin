@@ -12,8 +12,10 @@ import io.vertx.ext.web.handler.impl.HttpStatusException
 import fof.daq.service.common.extension.logger
 import fof.daq.service.common.extension.success
 import fof.daq.service.common.extension.toEntity
+import fof.daq.service.common.extension.value
 import fof.daq.service.mysql.dao.UserDao
 import fof.daq.service.mysql.entity.User
+import io.vertx.core.json.JsonObject
 
 @HandlerRequest(path = "/save", method = HttpMethod.POST)
 class SaveHandler @Autowired constructor(
@@ -47,7 +49,11 @@ class SaveHandler @Autowired constructor(
             userDao.save(user)
                 .map { it.toJson() } // bean转JSON会自动忽略密码等信息
                 .subscribe({
-                    event.response().success(it)
+                    if(!it.isEmpty && !it.value<String>("username").isNullOrEmpty())
+                        event.response().success(true, JsonObject().put("message","添加成功！"))
+                    else
+                        event.response().success(false, JsonObject().put("message","添加失败！"))
+
                 }, event::fail)
         } catch (e: Exception) {
             e.printStackTrace()

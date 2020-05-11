@@ -1,12 +1,13 @@
 package fof.daq.service.common.auth
 
+import fof.daq.service.mysql.entity.User
 import io.vertx.core.AsyncResult
 import io.vertx.core.Handler
 import io.vertx.core.buffer.Buffer
 import io.vertx.core.json.JsonObject
 import io.vertx.ext.auth.AuthProvider
 
-class AuthUser(authProvider: fof.daq.service.common.auth.MybatisAuthProvider) : fof.daq.service.common.auth.AbstractAuthUser() {
+class AuthUser(authProvider: MybatisAuthProvider, val user: User) : fof.daq.service.common.auth.AbstractAuthUser() {
 
 
     private var principal: JsonObject? = null
@@ -17,7 +18,10 @@ class AuthUser(authProvider: fof.daq.service.common.auth.MybatisAuthProvider) : 
     }
 
     override fun principal(): JsonObject? {
-        return principal
+        if (principal == null) {
+            // principal = JsonObject().put("username", username)
+        }
+        return user.toJson()
     }
 
     override fun setAuthProvider(authProvider: AuthProvider) {

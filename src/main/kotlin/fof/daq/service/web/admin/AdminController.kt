@@ -27,6 +27,9 @@ class AdminController @Autowired constructor(
     /*账户登入*/
     post("/login").handler(authHandler::login)
 
+    /*账户退出*/
+    post("/exit").handler(authHandler::exit)
+
     /*限制PUT/POST访问权限*/
-    // post("/*").handler(authHandler)
+     post("/*").handler(authHandler)
 })

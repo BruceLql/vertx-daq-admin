@@ -2,14 +2,12 @@ package fof.daq.service.mysql.dao
 
 import io.vertx.core.json.JsonObject
 import io.vertx.core.logging.Logger
-import io.vertx.ext.sql.UpdateResult
 import io.vertx.rxjava.ext.asyncsql.AsyncSQLClient
 import fof.daq.service.common.extension.logger
 import fof.daq.service.mysql.entity.CarrierStatistics
 import fof.daq.service.mysql.component.AbstractDao
 import fof.daq.service.mysql.component.PageItemDao
 import fof.daq.service.mysql.component.SQL
-import fof.daq.service.mysql.entity.SysConfig
 import fof.daq.service.mysql.entity.User
 import io.vertx.rxjava.ext.sql.SQLConnection
 import org.springframework.beans.factory.annotation.Autowired

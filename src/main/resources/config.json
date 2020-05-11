@@ -3,7 +3,7 @@
     "connection_string": "mongodb://39.108.162.204:27017/fof_crawler",
     "db_name": "fof_crawler"
   },
-  "HTTP.PORT": 8080,
+  "HTTP.PORT": 8081,
   "HTTP.HOST": "localhost",
 
   "MYSQL": {

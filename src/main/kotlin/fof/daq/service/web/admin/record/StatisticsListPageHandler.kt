@@ -1,20 +1,16 @@
 package fof.daq.service.web.admin.record
 
-import fof.daq.service.common.extension.*
+import fof.daq.service.common.extension.error
+import fof.daq.service.common.extension.logger
+import fof.daq.service.common.extension.regexDate
+import fof.daq.service.common.extension.value
+import fof.daq.service.service.CarrierStatisticsService
 import io.vertx.core.Vertx
 import io.vertx.core.http.HttpMethod
-import io.vertx.core.json.JsonObject
 import io.vertx.ext.web.RoutingContext
-import fof.daq.service.mongo.model.CarrierReportInfoModel
-import fof.daq.service.mongo.model.RecordModel
-import fof.daq.service.mysql.dao.SysConfigDao
-import fof.daq.service.mysql.entity.SysConfig
-import fof.daq.service.mysql.entity.User
-import fof.daq.service.service.CarrierStatisticsService
 import org.springframework.beans.factory.annotation.Autowired
 import tech.kavi.vs.web.ControllerHandler
 import tech.kavi.vs.web.HandlerRequest
-import java.util.ArrayList
 
 /**
  *  采集列表展示 - 按运营商类型、地区 分页查询
@@ -38,13 +34,15 @@ class StatisticsListPageHandler @Autowired constructor(
             val size = json.value<Int>("size")?:throw IllegalArgumentException("size 参数不合法！")
             if (!regexDate(startTime)) throw IllegalArgumentException("startTime 不符合时间格式！")
             if (!regexDate(endTime)) throw IllegalArgumentException("endTime 不符合时间格式！")
+            vertx.executeBlocking<String>({
+                carrierStatisticsService.queryGroupByOperatorAndAreaListPage(startTime, endTime,currentPage,size).subscribe({ list ->
 
-            carrierStatisticsService.queryGroupByOperatorAndAreaListPage(startTime, endTime,currentPage,size).subscribe({ list ->
-
-                log.info("=======采集列表 按运营商类型、地区 分页查询===========: ${list.toJson()}")
-                event.response().end(list.toJson().toString())
-
-            },{it.printStackTrace()})
+                    log.info("=======采集列表 按运营商类型、地区 分页查询===========: ${list.toJson()}")
+                    it.complete(list.toJson().toString())
+                },{it.printStackTrace()})
+            },{
+                event.response().end(it.result())
+            })
 
         }catch (e:Exception){
             e.printStackTrace()

@@ -34,15 +34,9 @@ class StatisticsListHandler @Autowired constructor(
             if (!regexDate(endTime)) throw IllegalArgumentException("endTime 不符合时间格式！")
 
             carrierStatisticsService.queryTotal(startTime, endTime).subscribe({ list ->
-                val totalList = ArrayList<JsonObject>()
-                // 取第一组 第一个
-                totalList.add(list[0][0])
-                // 第二组 循环取出
-                list[1].forEach{
-                    totalList.add(it)
-                }
-                log.info("=======采集列表汇总统计数据===========: $totalList")
-                event.response().end(totalList.toString())
+
+                log.info("=======采集列表汇总统计数据===========: $list")
+                event.response().end(list.toString())
 
             },{it.printStackTrace()})
 

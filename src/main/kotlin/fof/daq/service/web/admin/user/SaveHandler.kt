@@ -50,9 +50,9 @@ class SaveHandler @Autowired constructor(
                 .map { it.toJson() } // bean转JSON会自动忽略密码等信息
                 .subscribe({
                     if(!it.isEmpty && !it.value<String>("username").isNullOrEmpty())
-                        event.response().success(true, JsonObject().put("message","添加成功！"))
+                        event.response().success(true)
                     else
-                        event.response().success(false, JsonObject().put("message","添加失败！"))
+                        event.response().success(false)
 
                 }, event::fail)
         } catch (e: Exception) {

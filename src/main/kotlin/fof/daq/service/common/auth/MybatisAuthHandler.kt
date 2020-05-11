@@ -83,7 +83,7 @@ class MybatisAuthHandler(authProvider: AuthProvider) : AuthHandlerImpl(authProvi
     fun exit(context: RoutingContext) {
 
         context.clearUser()
-        context.response().end("exit succes")
+        context.response().success(true)
     }
 
 }

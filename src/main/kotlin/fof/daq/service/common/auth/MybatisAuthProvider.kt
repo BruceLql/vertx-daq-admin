@@ -26,12 +26,12 @@ class MybatisAuthProvider @Autowired constructor(
     override fun authenticate(authInfo: JsonObject, handler: Handler<AsyncResult<User>>) {
         val username = authInfo.value<String>("username")
 
-        if (username == null) {
+        if (username.isNullOrEmpty()) {
             handler.handle(Future.failedFuture(HttpStatusException(400, NullPointerException("Username is null"))))
             return
         }
         val password = authInfo.value<String>("password")
-        if (password == null) {
+        if (password.isNullOrEmpty()) {
             handler.handle(Future.failedFuture(HttpStatusException(400, NullPointerException("Password is null"))))
             return
         }

@@ -152,51 +152,6 @@ class CarrierStatisticsService @Autowired constructor(
         return carrierStatisticsModel.queryTotalData(jsonArray)
     }
 
-    /**
-     *  mongo 按运营商类型、城市分组汇总查询
-     *  @param dateStart 时间格式字符串
-     *  @param dateEnd  时间格式字符串
-     */
-    fun queryGroupByOpeertorAndCity(dateStart: String, dateEnd: String): Observable<MutableList<JsonObject>> {
-        val query = JsonObject()
-
-        query.put(
-            "created_at",
-            BasicDBObject("\$gte", JsonObject().put("\$date", dateStart.replace(" ", "T") + "Z")).append(
-                "\$lte",
-                JsonObject().put("\$date", dateEnd.replace(" ", "T") + "Z")
-            )
-        )
-        val all = BasicDBObject("_id", JsonObject().put("operator", "\$operator").put("city", "\$city"))
-            .append("avg", BasicDBObject("\$avg", "\$statistics"))
-            .append("max", BasicDBObject("\$max", "\$statistics"))
-            .append("min", BasicDBObject("\$min", "\$statistics"))
-            .append("count", BasicDBObject("\$sum", 1))
-            .append(
-                "sucCount", BasicDBObject(
-                    "\$sum",
-                    BasicDBObject(
-                        "\$cond",
-                        JsonArray().add(
-                            BasicDBObject(
-                                "\$ne",
-                                JsonArray().add("\$sucess").add(true)
-                            )
-                        ).add(0).add(1)
-                    )
-                )
-            )
-        val match = BasicDBObject("\$match", query)
-        val group = BasicDBObject("\$group", all)
-        val sort = BasicDBObject("\$sort", JsonObject().put("_id.city", -1).put("_id.operator", -1))
-        val jsonArray = JsonArray()
-        jsonArray.add(match)
-        jsonArray.add(group)
-        jsonArray.add(sort)
-
-        return carrierStatisticsModel.queryTotalData(jsonArray)
-    }
-
 
     /**
      *  查询汇总数据 不分页
@@ -206,7 +161,7 @@ class CarrierStatisticsService @Autowired constructor(
         val byOperatorObserv = queryGroupByOpeertor(dateStart, dateEnd)
 
         return Single.zip(totalObserv.toSingle(), byOperatorObserv.toSingle()) { total, byOperator ->
-            val _total = total.map {
+            val _total = total.mapNotNull {
                 if (it.value<String>("operator").isNullOrEmpty()
                     && it.value<JsonObject>("_id")?.value<String>("operator").isNullOrEmpty()
                 ) {
@@ -222,7 +177,18 @@ class CarrierStatisticsService @Autowired constructor(
                     BigDecimal(sucCount * 100).divide(BigDecimal(countValue), 2, BigDecimal.ROUND_HALF_UP).toDouble()
                 it.put("sucRat", sucRat)
             }
-            val returnDate = JsonArray().add(_total[0])
+            val returnDate = JsonArray()
+            if (_total.isEmpty()) returnDate.add(
+                JsonObject()
+                    .put("operator", "ALL")
+                    .put("count", 0)
+                    .put("sucRat", 0)
+                    .put("min", 0)
+                    .put("max", 0)
+                    .put("avg", 0)
+            ) else {
+                returnDate.add(_total[0])
+            }
 
             byOperator.mapNotNull {
                 if (!it.value<JsonObject>("_id")?.value<String>("operator").isNullOrEmpty()) {

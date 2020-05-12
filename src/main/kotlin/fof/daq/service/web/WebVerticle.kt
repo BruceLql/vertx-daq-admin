@@ -6,9 +6,12 @@ import io.vertx.ext.web.Router
 import fof.daq.service.common.extension.logger
 import fof.daq.service.common.extension.value
 import fof.daq.service.web.admin.AdminController
+import io.vertx.core.http.HttpMethod
+import io.vertx.ext.web.handler.CorsHandler
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
+import java.util.HashSet
 
 /**
  * Web模块
@@ -58,6 +61,29 @@ class WebVerticle : AbstractVerticle() {
          * [ 注意GET为前端请求，POST为后台数据访问 ]
          * */
 //        router.route("/static/*").handler(StaticHandler.create())
+
+        /*********************配置跨域*****************************/
+        val allowedHeaders: MutableSet<String> = HashSet()
+        allowedHeaders.add("x-requested-with")
+        allowedHeaders.add("Access-Control-Allow-Origin")
+        allowedHeaders.add("Access-Control-Allow-Headers")
+        allowedHeaders.add("Access-Control-Allow-Method")
+        allowedHeaders.add("Access-Control-Allow-Credentials")
+        allowedHeaders.add("Authorization")
+        allowedHeaders.add("origin")
+        allowedHeaders.add("Content-Type")
+        allowedHeaders.add("accept")
+        allowedHeaders.add("X-PINGARUNER")
+        val allowedMethods: MutableSet<HttpMethod> = HashSet()
+        allowedMethods.add(HttpMethod.GET)
+        allowedMethods.add(HttpMethod.POST)
+        allowedMethods.add(HttpMethod.OPTIONS)
+        allowedMethods.add(HttpMethod.DELETE)
+        allowedMethods.add(HttpMethod.PATCH)
+        allowedMethods.add(HttpMethod.PUT)
+        router.route().
+            handler(CorsHandler.create("*").allowedHeaders(allowedHeaders).allowedMethods(allowedMethods))
+
 
         /*HTTP端口监听*/
         vertx.createHttpServer()

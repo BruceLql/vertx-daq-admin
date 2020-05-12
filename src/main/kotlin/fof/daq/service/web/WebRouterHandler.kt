@@ -5,6 +5,7 @@ import io.vertx.ext.web.RoutingContext
 import io.vertx.ext.web.handler.impl.HttpStatusException
 import fof.daq.service.common.extension.error
 import fof.daq.service.common.extension.logger
+import io.vertx.core.impl.NoStackTraceThrowable
 import org.springframework.stereotype.Component
 import java.io.FileNotFoundException
 import javax.xml.bind.ValidationException
@@ -32,6 +33,7 @@ class WebRouterHandler{
             is SecurityException -> HttpResponseStatus.UNAUTHORIZED.code()
             is ValidationException -> HttpResponseStatus.BAD_REQUEST.code()
             is HttpStatusException -> e.statusCode
+            is NoStackTraceThrowable -> HttpResponseStatus.FORBIDDEN.code()
             else ->
                 if (routingContext.statusCode() > 0) {
                     routingContext.statusCode()

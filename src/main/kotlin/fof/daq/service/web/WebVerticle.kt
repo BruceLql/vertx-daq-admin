@@ -1,17 +1,19 @@
 package fof.daq.service.web
 
-import io.vertx.core.AbstractVerticle
-import io.vertx.core.json.JsonObject
-import io.vertx.ext.web.Router
 import fof.daq.service.common.extension.logger
 import fof.daq.service.common.extension.value
 import fof.daq.service.web.admin.AdminController
+import io.vertx.core.AbstractVerticle
 import io.vertx.core.http.HttpMethod
+import io.vertx.core.json.JsonArray
+import io.vertx.core.json.JsonObject
+import io.vertx.ext.web.Router
 import io.vertx.ext.web.handler.CorsHandler
+import io.vertx.ext.web.handler.StaticHandler
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
-import java.util.HashSet
+import java.util.*
 
 /**
  * Web模块
@@ -47,27 +49,33 @@ class WebVerticle : AbstractVerticle() {
     @Throws(Exception::class)
     override fun start() {
 
-        /*********************配置跨域*****************************/
-        val allowedHeaders: MutableSet<String> = HashSet()
+        /**
+         * 许可跨域授权 (注：直接设置全局*是无效的，必须试用绝对路径地址)
+         * */
+        val allowedHeaders = HashSet<String>()
         allowedHeaders.add("x-requested-with")
         allowedHeaders.add("Access-Control-Allow-Origin")
-        allowedHeaders.add("Access-Control-Allow-Headers")
-        allowedHeaders.add("Access-Control-Allow-Method")
-        allowedHeaders.add("Access-Control-Allow-Credentials")
-        allowedHeaders.add("Authorization")
         allowedHeaders.add("origin")
         allowedHeaders.add("Content-Type")
         allowedHeaders.add("accept")
         allowedHeaders.add("X-PINGARUNER")
-        val allowedMethods: MutableSet<HttpMethod> = HashSet()
+        val allowedMethods = HashSet<HttpMethod>()
         allowedMethods.add(HttpMethod.GET)
         allowedMethods.add(HttpMethod.POST)
         allowedMethods.add(HttpMethod.OPTIONS)
         allowedMethods.add(HttpMethod.DELETE)
         allowedMethods.add(HttpMethod.PATCH)
         allowedMethods.add(HttpMethod.PUT)
-        router.route().
-            handler(CorsHandler.create("*").allowedHeaders(allowedHeaders).allowedMethods(allowedMethods))
+        /*全局路由监听*/
+        config.value<JsonArray>("CORS")?.also {
+                list ->
+            list.forEach {
+                // 测试时路径可以写成  .*
+                router.route().
+                    handler(CorsHandler.create(it.toString()).allowedHeaders(allowedHeaders).allowedMethods(allowedMethods).allowCredentials(true))
+                log.info("Add Cors address: $it")
+            }
+        }
 
 
         /*全局路由监听*/
@@ -83,7 +91,7 @@ class WebVerticle : AbstractVerticle() {
          * 加载静态目录文件, 兼容SPA模式，找不到文件返回至跟路径
          * [ 注意GET为前端请求，POST为后台数据访问 ]
          * */
-//        router.route("/static/*").handler(StaticHandler.create())
+        router.route("/static/*").handler(StaticHandler.create())
 
 
         /*HTTP端口监听*/

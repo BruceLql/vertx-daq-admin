@@ -1,5 +1,6 @@
 package fof.daq.service.common.auth
 
+import fof.daq.service.common.extension.logger
 import fof.daq.service.common.extension.principal
 import io.vertx.core.AsyncResult
 import io.vertx.core.Future
@@ -11,11 +12,13 @@ import io.vertx.ext.auth.AuthProvider
 import io.vertx.ext.web.handler.impl.AuthHandlerImpl
 import io.vertx.ext.web.handler.impl.HttpStatusException
 import fof.daq.service.common.extension.success
+import fof.daq.service.common.extension.value
 import fof.daq.service.mysql.entity.User
 import org.springframework.stereotype.Service
 
 @Service
 class MybatisAuthHandler(authProvider: AuthProvider) : AuthHandlerImpl(authProvider) {
+    private val log = logger(this::class)
     /**
      * 数据访问验证
      * */
@@ -37,26 +40,22 @@ class MybatisAuthHandler(authProvider: AuthProvider) : AuthHandlerImpl(authProvi
      * 表单登录验证
      * */
     fun login(context: RoutingContext) {
-        println("-------------------login")
+        log.info("-------------------login -----------")
+        val bodyAsJson = context.bodyAsJson
         val req = context.request()
         if (req.method() != HttpMethod.POST) {
             context.fail(405)
             return
         }
-        /**
-         * 限制必须以表单形式提交数据
-         * */
-        if (!req.isExpectMultipart) {
-            throw IllegalStateException("HttpServerRequest should have set expect Multipart")
-        }
+
         val params = req.formAttributes()
-        val username = params.get("username")
-        val password = params.get("password")
+        val username = bodyAsJson.value<String>("username")
+        val password = bodyAsJson.value<String>("password")
 
         /**
          * 校验用户名与密码是否存在
          * */
-        if (username == null || password == null) {
+        if (username.isNullOrEmpty()|| password.isNullOrEmpty()) {
             context.fail(400, NullPointerException("No username or password provided in form?"))
             return
         }

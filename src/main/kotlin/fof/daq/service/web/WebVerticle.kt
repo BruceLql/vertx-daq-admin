@@ -47,21 +47,6 @@ class WebVerticle : AbstractVerticle() {
     @Throws(Exception::class)
     override fun start() {
 
-        /*全局路由监听*/
-        router.route().handler(webHandler::routerHandler)
-
-        /*管理后台入口*/
-        adminController.create(router, "/admin")
-
-        /*全局路由错误处理*/
-        router.route().failureHandler(webHandler::failureHandler)
-
-        /**
-         * 加载静态目录文件, 兼容SPA模式，找不到文件返回至跟路径
-         * [ 注意GET为前端请求，POST为后台数据访问 ]
-         * */
-//        router.route("/static/*").handler(StaticHandler.create())
-
         /*********************配置跨域*****************************/
         val allowedHeaders: MutableSet<String> = HashSet()
         allowedHeaders.add("x-requested-with")
@@ -83,6 +68,22 @@ class WebVerticle : AbstractVerticle() {
         allowedMethods.add(HttpMethod.PUT)
         router.route().
             handler(CorsHandler.create("*").allowedHeaders(allowedHeaders).allowedMethods(allowedMethods))
+
+
+        /*全局路由监听*/
+        router.route().handler(webHandler::routerHandler)
+
+        /*管理后台入口*/
+        adminController.create(router, "/admin")
+
+        /*全局路由错误处理*/
+        router.route().failureHandler(webHandler::failureHandler)
+
+        /**
+         * 加载静态目录文件, 兼容SPA模式，找不到文件返回至跟路径
+         * [ 注意GET为前端请求，POST为后台数据访问 ]
+         * */
+//        router.route("/static/*").handler(StaticHandler.create())
 
 
         /*HTTP端口监听*/

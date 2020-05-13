@@ -72,7 +72,7 @@ class WebVerticle : AbstractVerticle() {
             list.forEach {
                 // 测试时路径可以写成  .*
                 router.route().
-                    handler(CorsHandler.create(it.toString()).allowedHeaders(allowedHeaders).allowedMethods(allowedMethods).allowCredentials(true))
+                    handler(CorsHandler.create(".*").allowedHeaders(allowedHeaders).allowedMethods(allowedMethods).allowCredentials(true))
                 log.info("Add Cors address: $it")
             }
         }

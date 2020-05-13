@@ -18,7 +18,7 @@ data class CarrierStatistics constructor(
         var province: String? = null, // 省份
         var ip: String? = null, // ip
         var app_name: String? = null, // 产品名称
-        var sucess: Boolean ? = false  // 最终任务状态
+        var success: Boolean ? = false  // 最终任务状态
 
 ) : AbstractSchema() {
     override fun tableName() = TABLE_NAME

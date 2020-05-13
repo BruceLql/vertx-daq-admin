@@ -90,7 +90,7 @@ class CarrierStatisticsService @Autowired constructor(
                         JsonArray().add(
                             BasicDBObject(
                                 "\$ne",
-                                JsonArray().add("\$sucess").add(true)
+                                JsonArray().add("\$success").add(true)
                             )
                         ).add(0).add(1)
                     )
@@ -134,7 +134,7 @@ class CarrierStatisticsService @Autowired constructor(
                         JsonArray().add(
                             BasicDBObject(
                                 "\$ne",
-                                JsonArray().add("\$sucess").add(true)
+                                JsonArray().add("\$success").add(true)
                             )
                         ).add(0).add(1)
                     )

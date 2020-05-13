@@ -68,7 +68,7 @@ class CarrierStatisticsModel @Autowired constructor(val client: MongoClient) :
                         JsonArray().add(
                             BasicDBObject(
                                 "\$ne",
-                                JsonArray().add("\$sucess").add(true)
+                                JsonArray().add("\$success").add(true)
                             )
                         ).add(0).add(1)
                     )

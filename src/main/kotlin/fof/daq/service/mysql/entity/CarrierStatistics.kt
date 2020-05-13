@@ -26,7 +26,7 @@ data class CarrierStatistics(
     var ip: String? = null,                 // IP
     @field:JsonProperty("app_name")
     var app_name: String? = null,            // 服务名
-    var sucess: Boolean? = false,           // 城市
+    var success: Boolean? = false,           // 城市
     var carrier_001: String? = null,        // 预留字段
     var carrier_002: String? = null         // 预留字段
 ) : AbstractEntity() {

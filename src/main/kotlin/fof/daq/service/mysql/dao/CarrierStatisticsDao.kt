@@ -42,7 +42,7 @@ class CarrierStatisticsDao @Autowired constructor(
         val sql = "SELECT \n" +
                 "\"ALL\" operator,"+
                 "\tcount(*) count,\n" +
-                "\tROUND(sum(IF(c.sucess is TRUE, 1,0)) /count(*)*100,2) sucRat,\n" +
+                "\tROUND(sum(IF(c.success is TRUE, 1,0)) /count(*)*100,2) sucRat,\n" +
                 "\tMIN( c.statistics ) min,\n" +
                 "\tMAX( c.statistics ) max,\n" +
                 "\tcast(ROUND(avg( c.statistics ))as signed)  avg\n" +
@@ -62,7 +62,7 @@ class CarrierStatisticsDao @Autowired constructor(
         val sql = "SELECT \n" +
                 "\tc.operator,\n" +
                 "\tcount(*) count,\n" +
-                "\tROUND(sum(IF(c.sucess is TRUE, 1,0)) /count(*)*100,2) sucRat,\n" +
+                "\tROUND(sum(IF(c.success is TRUE, 1,0)) /count(*)*100,2) sucRat,\n" +
                 "\tMIN( c.statistics ) min,\n" +
                 "\tMAX( c.statistics ) max,\n" +
                 "\tcast(ROUND(avg( c.statistics ))as signed)  avg\n" +
@@ -105,7 +105,7 @@ class CarrierStatisticsDao @Autowired constructor(
                 "\tc.province,\n" +
                 "\tc.city,\n" +
                 "\tcount(*) count,\n" +
-                "\tROUND(sum(IF(c.sucess is TRUE, 1,0)) /count(*)*100,2) sucRat,\n" +
+                "\tROUND(sum(IF(c.success is TRUE, 1,0)) /count(*)*100,2) sucRat,\n" +
                 "\tMIN( c.statistics ) min,\n" +
                 "\tMAX( c.statistics ) max,\n" +
                 "\tcast(ROUND(avg( c.statistics ))as signed)  avg\n" +

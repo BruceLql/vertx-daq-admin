@@ -85,11 +85,7 @@ class UserDao @Autowired constructor(
      * */
 
     private fun updatePasswordAndPasswordSalt(conn: SQLConnection, user: User): Single<User> {
-      /*  val sql = SQL.init {
-            UPDATE(user.tableName())
-            SET(Pair("password", user.password))
-            WHERE(Pair("username", user.username))
-        }*/
+
         val sql = " UPDATE `${user.tableName()}` \n" +
                 "\tSET `password`  = '${user.password}', \n" +
                 "\t`password_salt` = '${user.passwordSalt}',\n" +
@@ -97,9 +93,9 @@ class UserDao @Autowired constructor(
                 "\tWHERE `username` = '${user.username}' \n" +
                 "\tand deleted_at = 0;"
 
-        println("update user:$user")
-        println("--------------------sql:" + sql)
+        log.info("update user:${user.username}")
         return this.update(conn, sql).map {
+            log.info("update user:${user.username} success!")
             user.apply { this.id = it.keys.getLong(0) }
         }
     }
@@ -111,15 +107,15 @@ class UserDao @Autowired constructor(
         val username = userName
         val password = newPassword
         if (oldPassword.isNullOrEmpty() || password.isNullOrEmpty()) {
-//            return Single.error(NullPointerException("Password is not null"))
+            return Single.error(NullPointerException("Password is not null"))
         }
         if (username.isNullOrEmpty()) {
-//            return Single.error(NullPointerException("Username is not null"))
+            return Single.error(NullPointerException("Username is not null"))
 
         }
         var result = false
        return this.login(listOf(Pair("username", username))).flatMap { user ->
-            println("====================login() ：$user")
+            log.info("====================修改密码 ：$user")
             user ?: throw HttpStatusException(403, NullPointerException("User is null"))
             val userPassword = user.password
             val passwordSalt = user.passwordSalt
@@ -130,11 +126,10 @@ class UserDao @Autowired constructor(
                     // 查询出来的密码
                     val version = strategy.version(userPassword)
                     val hashedPassword = strategy.computeHash(oldPassword, passwordSalt, version)
-                    val ss = strategy.isEqual(userPassword, hashedPassword)
-                    println(";;;;;;;;;;;;;;;;;;;;;;;; "+ss)
-                    if (ss) {
-                        test(username, password)
+                    if (strategy.isEqual(userPassword, hashedPassword)) {
+                        readyToUpdatePasswordAndPasswordSalt(username, password)
                     } else {
+                        log.info("用户：[${user.username}] 输入的原密码错误！")
                         Single.error(ExceptionInInitializerError("原密码错误！"))
 
                     }
@@ -149,8 +144,8 @@ class UserDao @Autowired constructor(
     /**
      *  更新密码及盐值
      */
-    fun test(username: String, password: String): Single<User> {
-        println("============ 允许修改 ===================")
+    fun readyToUpdatePasswordAndPasswordSalt(username: String, password: String): Single<User> {
+        log.info("===========更新用户[$username]的密码及盐值===================")
         // 允许修改
         val newUser = User()
         /*防止外部更新的数据（设为null不处理的数据）*/

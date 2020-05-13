@@ -40,7 +40,7 @@ class MybatisAuthHandler(authProvider: AuthProvider) : AuthHandlerImpl(authProvi
      * 表单登录验证
      * */
     fun login(context: RoutingContext) {
-        log.info("-------------------login -----------")
+        log.info("----- 开始登陆：login() -------")
         val bodyAsJson = context.bodyAsJson
         val req = context.request()
         if (req.method() != HttpMethod.POST) {
@@ -51,7 +51,7 @@ class MybatisAuthHandler(authProvider: AuthProvider) : AuthHandlerImpl(authProvi
         val params = req.formAttributes()
         val username = bodyAsJson.value<String>("username")
         val password = bodyAsJson.value<String>("password")
-
+        log.info("----- 登陆用户是：[$username] -------")
         /**
          * 校验用户名与密码是否存在
          * */
@@ -63,13 +63,13 @@ class MybatisAuthHandler(authProvider: AuthProvider) : AuthHandlerImpl(authProvi
         val authInfo = JsonObject().put("username", username).put("password", password)
         authProvider.authenticate(authInfo) { ar ->
             if (ar.succeeded()) {
-                println(ar.result().principal())
                 val user = ar.result()
-                println("==============user: ${user.principal<User>()}")
                 context.setUser(user)
                 session?.regenerateId()
+                log.info("用户：[$username] 登录成功！")
                 req.response().success(user.principal())
             } else {
+                log.info("用户：[$username] 登录失败！")
                 /*返回错误状态*/
                 context.fail(ar.cause())
             }
@@ -80,7 +80,7 @@ class MybatisAuthHandler(authProvider: AuthProvider) : AuthHandlerImpl(authProvi
      * 退出登录状态
      */
     fun exit(context: RoutingContext) {
-
+        log.info("---- 退出登录！-----")
         context.clearUser()
         context.response().success(true)
     }

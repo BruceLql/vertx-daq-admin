@@ -57,7 +57,7 @@ class MybatisAuthProvider @Autowired constructor(
                 }
             }
             .subscribe({ user ->
-                println("login() success :${user.toJson()}")
+                println("login() success :${user.username}")
                 val returnUser = fof.daq.service.mysql.entity.User()
                 returnUser.mobile=user.mobile
                 returnUser.id=user.id

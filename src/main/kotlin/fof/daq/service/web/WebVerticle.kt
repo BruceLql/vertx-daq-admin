@@ -67,14 +67,11 @@ class WebVerticle : AbstractVerticle() {
         allowedMethods.add(HttpMethod.PATCH)
         allowedMethods.add(HttpMethod.PUT)
         /*全局路由监听*/
-        config.value<JsonArray>("CORS")?.also {
-                list ->
-            list.forEach {
-                // 测试时路径可以写成  .*
-                router.route().
-                    handler(CorsHandler.create(".*").allowedHeaders(allowedHeaders).allowedMethods(allowedMethods).allowCredentials(true))
-                log.info("Add Cors address: $it")
-            }
+        config.value<String>("CORS")?.also {
+            // 测试时路径可以写成  .*
+            router.route().
+                handler(CorsHandler.create(it).allowedHeaders(allowedHeaders).allowedMethods(allowedMethods).allowCredentials(true))
+            log.info("Add Cors address: $it")
         }
 
 

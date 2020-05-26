@@ -1,14 +1,14 @@
 {
-  "CORS": "http://192.168.1.139:8000",
+  "CORS": "http://192.168.3.5:8000",
   "MONGO": {
-    "connection_string": "mongodb://39.108.162.204:27017/fof_crawler",
+    "connection_string": "mongodb://localhost:27017/fof_crawler",
     "db_name": "fof_crawler"
   },
   "HTTP.PORT": 8080,
   "HTTP.HOST": "localhost",
 
   "MYSQL": {
-    "host": "39.108.162.204",
+    "host": "localhost",
     "port": 3306,
     "database": "test",
     "username": "root",

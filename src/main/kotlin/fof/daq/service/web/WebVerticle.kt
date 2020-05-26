@@ -5,7 +5,6 @@ import fof.daq.service.common.extension.value
 import fof.daq.service.web.admin.AdminController
 import io.vertx.core.AbstractVerticle
 import io.vertx.core.http.HttpMethod
-import io.vertx.core.json.JsonArray
 import io.vertx.core.json.JsonObject
 import io.vertx.ext.web.Router
 import io.vertx.ext.web.handler.CorsHandler

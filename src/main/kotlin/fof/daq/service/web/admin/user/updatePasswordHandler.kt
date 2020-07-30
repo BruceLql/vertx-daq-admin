@@ -62,7 +62,7 @@ class updatePasswordHandler @Autowired constructor(
                 it.printStackTrace()
                 event.fail(it)
             })
-
+            println("hello")
         } catch (e: Exception) {
             e.printStackTrace()
             event.fail(e)

@@ -69,7 +69,4 @@ class updatePasswordHandler @Autowired constructor(
         }
     }
 
-    fun test(){
-        println("test 002")
-    }
 }

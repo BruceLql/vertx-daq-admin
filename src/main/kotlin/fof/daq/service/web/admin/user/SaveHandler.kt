@@ -59,4 +59,8 @@ class SaveHandler @Autowired constructor(
             e.printStackTrace()
         }
     }
+
+    fun test(){
+        println("Just test demo")
+    }
 }

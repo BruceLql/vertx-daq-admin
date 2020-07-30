@@ -68,4 +68,8 @@ class updatePasswordHandler @Autowired constructor(
             event.fail(e)
         }
     }
+
+    fun test(){
+        println("test 002")
+    }
 }
